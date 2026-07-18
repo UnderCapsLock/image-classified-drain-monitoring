@@ -124,7 +124,7 @@ const char* SERVER_IP     = "yourLaptopIP";   // run ipconfig (IPv4 address)
 ## Results
 
 - Final model accuracy: ~97%
-- Placed Top 5 at YIC State Round 2026
+- Placed Top 5 at YIC State Round 2026 (Malaysia)
 
 ## License
 
@@ -133,4 +133,5 @@ MIT license.
 ## Extra Notes
 
 to whomever finds this, free to copy verbatim and edit if you like
+
 vibecoded using claude sonnet 5 and chatgpt gpt-5
