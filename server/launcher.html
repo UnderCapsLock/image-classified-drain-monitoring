@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DrainWatch Launcher</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0a0f14;--surface:#111820;--border:#1e2a35;
+  --text:#e2e8f0;--muted:#4a6070;
+  --accent:#00d4ff;--mock:#f59e0b;
+  --clear:#22c55e;
+}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Inter',sans-serif;
+  min-height:100vh;display:flex;
+  flex-direction:column;align-items:center;
+  justify-content:center;gap:48px;padding:32px;
+}
+
+.logo{
+  text-align:center;
+}
+.wordmark{
+  font-family:'IBM Plex Mono',monospace;font-weight:600;
+  font-size:36px;letter-spacing:.12em;color:var(--accent);
+}
+.wordmark span{color:var(--text);}
+.tagline{
+  font-family:'IBM Plex Mono',monospace;font-size:12px;
+  color:var(--muted);letter-spacing:.2em;margin-top:8px;
+}
+
+.cards{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  width:100%;max-width:640px;
+}
+
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:12px;padding:32px 28px;
+  display:flex;flex-direction:column;gap:16px;
+  cursor:pointer;transition:all .2s;text-decoration:none;color:inherit;
+}
+.card:hover{transform:translateY(-2px);}
+.card.live{border-top:3px solid var(--accent);}
+.card.live:hover{border-color:var(--accent);box-shadow:0 0 32px #00d4ff18;}
+.card.mock{border-top:3px solid var(--mock);}
+.card.mock:hover{border-color:var(--mock);box-shadow:0 0 32px #f59e0b18;}
+
+.card-icon{font-size:28px;}
+.card-title{
+  font-family:'IBM Plex Mono',monospace;font-weight:600;
+  font-size:16px;letter-spacing:.08em;
+}
+.card.live .card-title{color:var(--accent);}
+.card.mock .card-title{color:var(--mock);}
+.card-desc{font-size:13px;color:var(--muted);line-height:1.6;}
+.card-port{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;
+  padding:4px 10px;border-radius:4px;border:1px solid var(--border);
+  color:var(--muted);display:inline-block;width:fit-content;
+}
+
+.status-row{
+  display:flex;gap:20px;align-items:center;
+}
+.status-dot{
+  width:8px;height:8px;border-radius:50%;
+  display:inline-block;margin-right:6px;
+}
+.status-item{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;
+  color:var(--muted);display:flex;align-items:center;
+  cursor:pointer;
+}
+.status-item:hover{color:var(--text);}
+
+.db-section{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  width:100%;max-width:640px;
+}
+.db-section-label{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;
+  color:var(--muted);letter-spacing:.18em;text-transform:uppercase;
+}
+.db-buttons{display:flex;gap:12px;}
+.db-btn{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.08em;
+  padding:8px 18px;border-radius:6px;cursor:pointer;
+  border:1px solid #ef444450;background:#ef444410;color:#ef4444;
+  transition:all .2s;
+}
+.db-btn:hover{background:#ef444425;border-color:#ef4444;}
+
+.confirm-overlay{
+  display:none;position:fixed;inset:0;
+  background:#0a0f14cc;backdrop-filter:blur(4px);
+  z-index:50;align-items:center;justify-content:center;
+}
+.confirm-overlay.show{display:flex;}
+.confirm-box{
+  background:#111820;border:1px solid #ef444460;
+  border-radius:12px;padding:32px 36px;
+  display:flex;flex-direction:column;gap:18px;
+  align-items:center;max-width:360px;text-align:center;
+}
+.confirm-title{
+  font-family:'IBM Plex Mono',monospace;font-weight:600;
+  font-size:15px;color:#ef4444;letter-spacing:.06em;
+}
+.confirm-desc{font-size:13px;color:var(--muted);line-height:1.6;}
+.confirm-btns{display:flex;gap:10px;}
+.btn-cancel{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.07em;
+  padding:8px 20px;border-radius:5px;border:1px solid var(--border);
+  background:var(--surface);color:var(--muted);cursor:pointer;transition:all .15s;
+}
+.btn-cancel:hover{color:var(--text);border-color:var(--muted);}
+.btn-confirm{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.07em;
+  padding:8px 20px;border-radius:5px;border:1px solid #ef4444;
+  background:#ef444415;color:#ef4444;cursor:pointer;transition:all .15s;
+}
+.btn-confirm:hover{background:#ef444430;}
+
+.toast{
+  position:fixed;bottom:24px;right:24px;
+  background:#111820;border:1px solid var(--clear);
+  color:var(--clear);font-family:'IBM Plex Mono',monospace;
+  font-size:12px;padding:10px 18px;border-radius:6px;
+  opacity:0;transition:opacity .3s;pointer-events:none;z-index:99;
+}
+.toast.show{opacity:1;}
+
+.footer{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;
+  color:var(--muted);letter-spacing:.12em;text-align:center;
+}
+
+@keyframes pulse{
+  0%,100%{opacity:1;transform:scale(1);}
+  50%{opacity:.4;transform:scale(.75);}
+}
+</style>
+</head>
+<body>
+
+<div class="logo">
+  <div class="wordmark">DRAIN<span>WATCH</span></div>
+  <div class="tagline">SMART DRAIN MONITORING SYSTEM</div>
+</div>
+
+<div class="cards">
+
+  <a class="card live" href="http://localhost:5000" target="_blank">
+    <div class="card-icon">📡</div>
+    <div class="card-title">LIVE SYSTEM</div>
+    <div class="card-desc">
+      Real-time feed from physical camera nodes.<br>
+      Live AI classification, event log, and alerts.
+    </div>
+    <div class="card-port">localhost:5000</div>
+  </a>
+
+  <a class="card mock" href="http://localhost:5001" target="_blank">
+    <div class="card-icon">⚡</div>
+    <div class="card-title">MOCK SIMULATOR</div>
+    <div class="card-desc">
+      20 simulated drain nodes with time simulation,
+      manual overrides, and maintenance scheduling.
+    </div>
+    <div class="card-port">localhost:5001</div>
+  </a>
+
+</div>
+
+<div class="status-row">
+  <div class="status-item" onclick="checkServer(5000)">
+    <span class="status-dot" id="dot-5000" style="background:var(--muted);"></span>
+    Live Server :5000
+  </div>
+  <div class="status-item" onclick="checkServer(5001)">
+    <span class="status-dot" id="dot-5001" style="background:var(--muted);"></span>
+    Mock Server :5001
+  </div>
+</div>
+
+<div class="db-section">
+  <div class="db-section-label">⚠ Database Management</div>
+  <div class="db-buttons">
+    <button class="db-btn" onclick="askClear('live')">🗑 Clear Live DB</button>
+    <button class="db-btn" onclick="askClear('mock')">🗑 Clear Mock DB</button>
+    <button class="db-btn" onclick="askClear('both')" style="border-color:#ff000070;color:#ff6060;">
+      🗑 Clear Both
+    </button>
+  </div>
+</div>
+
+<div class="footer">DRAINWATCH — COMPETITION DEMO · 2025</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-overlay" id="overlay">
+  <div class="confirm-box">
+    <div class="confirm-title" id="confirm-title">CLEAR DATABASE?</div>
+    <div class="confirm-desc" id="confirm-desc">This will permanently delete all readings. This cannot be undone.</div>
+    <div class="confirm-btns">
+      <button class="btn-cancel" onclick="closeOverlay()">Cancel</button>
+      <button class="btn-confirm" id="confirm-ok" onclick="doConfirm()">Yes, Clear</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let pendingTarget = null;
+
+function showToast(msg, ok=true) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor = ok ? 'var(--clear)' : '#ef4444';
+  t.style.color       = ok ? 'var(--clear)' : '#ef4444';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function askClear(target) {
+  pendingTarget = target;
+  const titles = { live:'CLEAR LIVE DATABASE?', mock:'CLEAR MOCK DATABASE?', both:'CLEAR BOTH DATABASES?' };
+  const descs  = {
+    live: 'All readings from real camera nodes will be permanently deleted.',
+    mock: 'All simulated events and schedule data will be permanently deleted.',
+    both: 'ALL data from both systems will be permanently deleted. Cannot be undone.',
+  };
+  document.getElementById('confirm-title').textContent = titles[target];
+  document.getElementById('confirm-desc').textContent  = descs[target];
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeOverlay() {
+  document.getElementById('overlay').classList.remove('show');
+  pendingTarget = null;
+}
+
+async function doConfirm() {
+  closeOverlay();
+  const targets = pendingTarget === 'both' ? [5000, 5001] :
+                  pendingTarget === 'live' ? [5000] : [5001];
+  let ok = true;
+  for (const port of targets) {
+    try {
+      const r = await fetch(`http://localhost:${port}/clear_db`, {method:'POST'});
+      if (!r.ok) ok = false;
+    } catch {
+      ok = false;
+    }
+  }
+  showToast(ok ? 'Database cleared ✓' : 'Error — is the server running?', ok);
+  setTimeout(() => { checkServer(5000); checkServer(5001); }, 600);
+}
+
+async function checkServer(port) {
+  const dot = document.getElementById('dot-' + port);
+  try {
+    // Use no-cors mode so file:// origin doesn't block the request
+    const ctrl = new AbortController();
+    setTimeout(() => ctrl.abort(), 2000);
+    await fetch('http://localhost:' + port + '/data', {
+      signal: ctrl.signal, mode: 'no-cors'
+    });
+    // no-cors fetch resolves (even opaque) = server is up
+    dot.style.background = '#22c55e';
+    dot.style.animation  = 'pulse 1.8s ease-in-out infinite';
+  } catch {
+    dot.style.background = '#ef4444';
+    dot.style.animation  = '';
+  }
+}
+
+window.addEventListener('load', () => { checkServer(5000); checkServer(5001); });
+setInterval(() => { checkServer(5000); checkServer(5001); }, 5000);
+</script>
+</body>
+</html>
