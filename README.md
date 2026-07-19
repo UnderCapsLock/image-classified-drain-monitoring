@@ -1,6 +1,9 @@
 # image-classified-drain-monitoring
 Simple image classification of images of drains into three categories of severity.
 
+![Python](https://img.shields.io/badge/python-3.11-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 ## Overview
 
 Image classification system with dashboard and database using ESP32-CAM and ESP32-S3-CAM. Used for mock drains and categorising said mock drains into three categories, which are:
@@ -116,10 +119,28 @@ const char* SERVER_IP     = "yourLaptopIP";   // run ipconfig (IPv4 address)
     ├── drainwatch_esp32.ino     # ESP32-CAM
     └── drainwatch_esp32s3.ino   # ESP32-S3-CAM
 ```
+## Roadmap
 
-## Future Developments
+**Fixing**
+- [x] Fixed collect_images.py auto-labelling bug (unrecognized hints now go to dataset/unsorted/ instead of silently mislabeling as "clear")
+- [ ] Deprecate mock_server.py fully
 
-- nothing planned, will stay dormant
+**Reliability**
+- [ ] Migrate from HTTP POST to MQTT for better handling of unstable network conditions
+
+**Notifications**
+- [ ] Browser push notifications (Notification API)
+- [ ] Telegram bot integration
+- [ ] Simple public-facing status website
+
+**Deployment**
+- [ ] Docker containerization
+- [ ] Config file instead of hardcoded WiFi credentials in firmware
+
+**Dashboard**
+- [ ] Editable node names via UI
+- [ ] Add/remove nodes dynamically without code changes
+- [ ] Visual "system healthy" indicator beyond raw uptime (e.g. last-successful-classification timestamp, heartbeat indicator)
 
 ## Results
 
