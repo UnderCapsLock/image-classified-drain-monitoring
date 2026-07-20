@@ -130,6 +130,8 @@ not in any order
 - [ ] Editable node names via UI
 - [ ] Add/remove nodes dynamically without code changes
 - [ ] Visual "system healthy" indicator beyond raw uptime
+- [ ] Readding mock server for preliminary use
+- [ ] Adding more images to README.md
 
 ## Results
 
