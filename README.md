@@ -24,7 +24,7 @@ ESP32-CAM/ESP32-S3-CAM → WiFi → Flask Server → AI Classifier (TFLite) → 
 
 Two systems:
 - **Live system** — real camera node (singular), live classification, live dashboard with sound alerts
-- **Mock system** — non-functional, would avoid use, its here though
+- **Mock system** — deprecated, non-functional. Kept in repo for reference only, see `mock_server_deprecated.py`
 
 ## Tech Stack
 
@@ -52,10 +52,8 @@ python server.py
 ```
 live system, port 5000 on `http://localhost:5000`.
 
-```bash
-python mock_server.py
-```
-mock system, port 5001 (dont do this) on `http://localhost:5001`.
+> `mock_server.py` is deprecated and non-functional — see Roadmap section.
+> Renamed to `mock_server_deprecated.py`, kept for reference only.
 
 ### collecting your own training images
 
@@ -64,7 +62,9 @@ python collect_images.py
 ```
 runs a Flask server that receives images from an ESP32 and saves them 
 into `dataset/clear/`, `dataset/partial/`, `dataset/blocked/` based on a 
-label you provide. (fatal error: all images go to clear, manual relabell      ing needed.)
+label you provide. Unrecognized or missing labels are saved to 
+`dataset/unsorted/` instead of being silently mislabeled — sort these 
+manually before training.
 
 ### how to train your own model
 
@@ -104,7 +104,7 @@ const char* SERVER_IP     = "yourLaptopIP";   // run ipconfig (IPv4 address)
 │
 ├── server/
 │   ├── server.py            # live dashboard + AI classification server
-│   ├── mock_server.py       # mock simulator (bad, dont use)
+│   ├── mock_server_deprecated.py  # non-functional, kept for reference only
 │   ├── launcher.html        # simple homepage linking both dashboards
 │   ├── requirements.txt
 │   └── start.sh
@@ -123,7 +123,7 @@ const char* SERVER_IP     = "yourLaptopIP";   // run ipconfig (IPv4 address)
 
 **Fixing**
 - [x] Fixed collect_images.py auto-labelling bug (unrecognized hints now go to dataset/unsorted/ instead of silently mislabeling as "clear")
-- [ ] Deprecate mock_server.py fully
+- [x] Deprecated mock_server.py (renamed to mock_server_deprecated.py, removed from usage docs)
 
 **Reliability**
 - [ ] Migrate from HTTP POST to MQTT for better handling of unstable network conditions

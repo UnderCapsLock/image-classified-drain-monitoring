@@ -32,22 +32,31 @@ def save_image(label, raw_bytes):
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    data = request.get_json()
+    raw        = request.data
+    class_hint = request.args.get("class", "").lower().strip()
 
-    if not data or "image" not in data:
-        print("  No JSON image received")
+    if not raw or len(raw) < 100:
+        print(f"  Empty body received — skipping")
         return jsonify({"error": "no image"}), 400
 
-    class_hint = request.args.get("class", "").lower().strip()
-    label = class_hint if class_hint in CLASSES else "clear"
+    # Verify it looks like a JPEG (starts with FFD8)
+    if raw[:2] != b'\xff\xd8':
+        print(f"  Warning: doesn't look like JPEG (starts with {raw[:4].hex()}) — saving anyway")
 
-    try:
-        raw_bytes = base64.b64decode(data["image"])
-    except Exception as e:
-        print("  Base64 decode failed:", e)
-        return jsonify({"error": "decode failed"}), 400
+    if class_hint in CLASSES:
+        save_image(class_hint, raw)
+    else:
+        # FIXED: previously silently defaulted to "clear" which corrupted
+        # the dataset. Now routes to dataset/unsorted/ so nothing gets
+        # mislabeled, and the problem is visible instead of hidden.
+        os.makedirs(f"{SAVE_ROOT}/unsorted", exist_ok=True)
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        filepath = os.path.join(SAVE_ROOT, "unsorted", ts + ".jpg")
+        with open(filepath, "wb") as f:
+            f.write(raw)
+        print(f"  ⚠ Unlabeled image (hint='{class_hint}') → dataset/unsorted/")
+        print(f"    Check ESP32 is sending ?class=clear|partial|blocked correctly")
 
-    save_image(label, raw_bytes)
     return jsonify({"status": "ok"}), 200
 
 @app.route("/relabel", methods=["POST"])
