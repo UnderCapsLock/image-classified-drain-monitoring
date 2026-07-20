@@ -16,15 +16,15 @@ Simply put...
 ESP32-CAM/ESP32-S3-CAM → WiFi → Flask Server → AI Classifier (TFLite) → SQLite → Dashboard
 
 **How it works:**
-1. ESP32 captures a JPEG image every few seconds
+1. an ESP32-CAM or ESP32-S3-CAM captures a JPEG image every few seconds
 2. image is base64-encoded and sent via HTTP POST to the Flask server
 3. server decodes the image and feeds it to a TFLite classifier
 4. classification result + confidence is saved to SQLite
 5. dashboard polls the server every second and updates live — no page reloads
 
 Two systems:
-- **Live system** — real camera node (singular), live classification, live dashboard with sound alerts
-- **Mock system** — deprecated, non-functional. Kept in repo for reference only, see `mock_server_deprecated.py`
+- **Live system** — with real node, live classification shown in dashboard with sound alerts
+- **Mock system** — deprecated, non-functional. for reference only, see `mock_server_deprecated.py`
 
 ## Tech Stack
 
@@ -75,8 +75,7 @@ trains a MobileNetV2-based classifier on whatever is inside `dataset/`.
 output is two files:
 - `drain_model.tflite` — model
 - `labels.txt` — class names
-
-Copy both into the same folder and restart server as `server.py` to use the new model. 
+copy both into the same folder and restart server as `server.py` to use the new model. 
 
 ### flashing the ESP32
 
@@ -84,7 +83,7 @@ see `/firmware` for both board variants:
 - `drainwatch_esp32.ino` — for ESP32-CAM
 - `drainwatch_esp32s3.ino` — for ESP32-S3-CAM
 
-Before flashing, edit these lines at the top of the file:
+before flashing, edit these lines at the top of the file:
 ```cpp
 const char* WIFI_SSID     = "yourNetworkName";
 const char* WIFI_PASSWORD = "yourPassword";
@@ -119,28 +118,18 @@ const char* SERVER_IP     = "yourLaptopIP";   // run ipconfig (IPv4 address)
     ├── drainwatch_esp32.ino     # ESP32-CAM
     └── drainwatch_esp32s3.ino   # ESP32-S3-CAM
 ```
-## Roadmap
+## Future Developments
 
-**Fixing**
-- [x] Fixed collect_images.py auto-labelling bug (unrecognized hints now go to dataset/unsorted/ instead of silently mislabeling as "clear")
-- [x] Deprecated mock_server.py (renamed to mock_server_deprecated.py, removed from usage docs)
-
-**Reliability**
-- [ ] Migrate from HTTP POST to MQTT for better handling of unstable network conditions
-
-**Notifications**
-- [ ] Browser push notifications (Notification API)
+not in any order
+- [ ] Migrate from HTTP POST to MQTT for stability
+- [ ] Browser push notifications
 - [ ] Telegram bot integration
-- [ ] Simple public-facing status website
-
-**Deployment**
+- [ ] Simple dashboard website
 - [ ] Docker containerization
-- [ ] Config file instead of hardcoded WiFi credentials in firmware
-
-**Dashboard**
+- [ ] Config file instead of hardcoded WiFi credentials
 - [ ] Editable node names via UI
 - [ ] Add/remove nodes dynamically without code changes
-- [ ] Visual "system healthy" indicator beyond raw uptime (e.g. last-successful-classification timestamp, heartbeat indicator)
+- [ ] Visual "system healthy" indicator beyond raw uptime
 
 ## Results
 
