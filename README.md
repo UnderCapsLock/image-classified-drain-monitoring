@@ -132,6 +132,8 @@ not in any order
 - [ ] Visual "system healthy" indicator beyond raw uptime
 - [ ] Readding mock server for preliminary use
 - [ ] Adding more images to README.md
+- [ ] Document evidence tiers for DrainWatch subsystems
+- [ ] Add a documented failure log
 
 ## Results
 
